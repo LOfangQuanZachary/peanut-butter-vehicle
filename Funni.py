@@ -1,3 +1,4 @@
+import navigation as nav
 import RPi.GPIO as GPIO
 import threading
 import time
