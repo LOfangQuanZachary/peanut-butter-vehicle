@@ -1,10 +1,17 @@
-import navigation as nav
+from cmath import cos, sin
+import numpy as np
 import RPi.GPIO as GPIO
 import threading
 import time
 import serial
+import bezier
+totalDisplacemenX = 0
+totalDisplacemenY = 0
+totalDisplacementEnd = 0
+i = 0
 beginButton = 5
 serialInput = ""
+bezierPoints = []
 #start of serial transmission setup
 if __name__ == '__main__':
     ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
@@ -22,19 +29,39 @@ def serialTransmission(toTransmit):
     return serialInput
 #setUp and initialization code
 def setUpCode():
-    GPIO.pinMode(5, GPIO.OUTPUT)
     GPIO.cleanup()
     serialTransmission("Begin")
+    bezierPoints = get_instructions_for_bezier()
     while serialTransmission("") != "StartingRun":
         time.sleep(0.01)
-#self driving functions
-def selfDrivingCode(gyroAngle, currentMotorSpeedA, currentMotorSpeedB):
-    pass
 #shut down code
 def shutDown():
     serialTransmission("kill")
 #main body of code
 def main():
     setUpCode()
-main()
+    drivingCode()
+def drivingCode():
+    while totalDisplacementEnd != bezierPoints[i][1]:
+        arr = accelVectorFunni()
+        X = arr[0]
+        Y = arr[1]
+        Xdisplacement = pow(0.1, 2) * X
+        Ydisplacement = pow(0.1, 2) * Y
+        totalDisplacemenX = Xdisplacement + totalDisplacemenX
+        totalDisplacemenY = Ydisplacement + totalDisplacemenY
+        totalDisplacementEnd = np.sqrt(pow(totalDisplacementX, 2) + pow(totalDisplacemenY, 2))
 
+def get_instructions_for_bezier():
+    pass
+
+
+def accelVectorFunni():
+    pass
+    
+main()
+def drivingLoop():
+    for i in(len(bezierPoints)):
+        totalDisplacemenX = 0
+        totalDisplacemenY = 0
+        drivingCode(i)
